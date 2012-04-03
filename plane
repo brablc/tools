@@ -1,0 +1,8 @@
+#!/bin/bash
+if (( $# )); then
+  perl -plane $*
+else
+  echo "# Usage: $0 '\$_=@F[0]'"
+  echo -e "# Reading standard input to show column numbers ...\n"
+  head -1 | perl -plane 'print map{$i++=>"\t$_\n"}@F'
+fi
