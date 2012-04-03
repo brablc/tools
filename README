@@ -4,3 +4,8 @@ plane - stands for perl with -plane switches.
 
  * Replaces awk - reads a file from standard input into @F variable.
    and allows easy filtering including regexp group matching.
+ * Run without params to show numbers of fields in standard input.
+ * You can access fields from end using 
+     plane '$_=@F[-1]'
+ * You can print multiple fields using
+     plane '$_=join("\t",@F[0..2,-1])'
