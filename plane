@@ -8,4 +8,4 @@ if (( !$# )); then
   exit
 fi
 
-perl -F/$2/ -lane "$1"
+perl -F/${2-\\s+}/ -lane "$1"

@@ -1,4 +1,4 @@
 #!/bin/bash
-echo "# Columns are delimited by white space if no parameter is passed."
+echo "# Columns are delimited by multiple white spaces if no parameter is passed."
 echo "# Reading standard input to show column numbers ..."
-head -1 | perl -F/$1/ -lane 'print map{$i++=>"\t$_\n"}@F; print "# Actual line read:"; print;'
+head -1 | perl -F/${1-\\s+}/ -lane 'print map{$i++=>"\t$_\n"}@F; print "# Actual line read:"; print;'
