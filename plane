@@ -1,8 +1,12 @@
 #!/bin/bash
-if (( $# )); then
-  perl -lane "$*"
-else
-  echo "# Usage: $0 'print @F[0]'"
-  echo -e "# Reading standard input to show column numbers ...\n"
-  head -1 | perl -plane 'print map{$i++=>"\t$_\n"}@F'
+if (( !$# )); then
+  echo "Usage:   $0 [perl_cli_params] <perl_code>"
+  echo "Example: plane 'print @F[0]' # white space delimited columns"
+  echo "Example: plane -F\" 'print @F[0]' # quotes delimited columns"
+  echo "Hint:    Use planes command to display columns."
+  exit
 fi
+
+COMMAND="$1"
+shift
+perl $* -lane "$COMMAND" 
