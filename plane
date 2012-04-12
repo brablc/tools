@@ -1,9 +1,10 @@
 #!/bin/bash
 if (( !$# )); then
   echo "Usage:   $0 [perl_cli_params] <perl_code>"
-  echo "Example: plane 'print @F[0]' # white space delimited columns"
-  echo "Example: plane -F\" 'print @F[0]' # quotes delimited columns"
   echo "Hint:    Use planes command to display columns."
+  echo "Examples: "
+  echo "  plane 'print @F[0]' # white space delimited columns"
+  echo "  plane -F\\\" 'print @F[-2]' # quotes delimited columns"
   exit
 fi
 
