@@ -1,0 +1,59 @@
+#!/bin/bash
+
+CMD=pkguninstall 
+
+if [ "$0" = "-bash" ]; then
+
+    function _pkguninstall_pkgs() {
+        local cur
+        cur="${COMP_WORDS[COMP_CWORD]}"
+        COMPREPLY=( $( compgen -W "$(pkgutil --pkgs)" -- ${cur}) )
+    }
+
+    complete -F _pkguninstall_pkgs $CMD
+    return
+
+fi
+
+if [ $# = 0 ]; then
+    cat >&2 <<_USAGE
+Usage: 
+    $CMD PKGID [--execute]
+
+Without --execute parameter it will run in dry run mode.
+You will most likely need to run it through sudo.
+
+Run this line to use command completion:
+    . $CMD
+_USAGE
+    exit 0
+fi
+
+PKGID=$1
+EXECUTE=0
+if [ "$2" = "--execute" ]; then
+    EXECUTE=1
+fi
+
+echo "Package info:"
+pkgutil --pkg-info $PKGID
+echo ""
+cd /
+echo "Deleting $(pkgutil --only-files --files $PKGID | wc -l) files using sudo ..."  
+pkgutil --only-files --files $PKGID | while read FILE; do
+    [ -f "$FILE" ] && echo -e "\t/$FILE" && [[ $EXECUTE == 1 ]] && rm -f
+done
+echo "Files deleted."
+
+echo "Pruning empty directories with sudo ... "
+pkgutil --only-dirs --files $PKGID | while read DIR; do 
+    [ -s "$DIR" ] && echo -e "\t/$DIR" && [[ $EXECUTE == 1 ]] && find "$DIR" -type d -empty -delete    
+done
+echo "Empty directories deleted."
+
+echo "Finally forget the package."
+[[ $EXECUTE == 1 ]] && pkgutil --forget $PKGID
+
+echo ""
+echo "Package info (do we still have it?):"
+pkgutil --pkg-info $PKGID
