@@ -1,0 +1,72 @@
+#!/bin/bash
+
+function tmrunning() {
+    return $([ $(tmutil currentphase) != 'BackupNotRunning' ])
+}
+
+function echostate() {
+    DATE=$(date +"%Y-%m-%d %H:%M:%S")
+    STATE=$1
+    shift
+    OPT=""
+    if [ "$STATE" = "-n" ]; then 
+        OPT=$STATE
+        STATE=$1
+        shift
+    fi
+    echo $OPT "-$STATE|$DATE|" $* 
+}
+
+function tmrun() {
+    hash NoSleepCtrl 2>/dev/null
+    HASNOSLEEP=$?
+    if [ $HASNOSLEEP ]; then
+        NOSLEEPSAVESTATE=$(NoSleepCtrl -v 0 -g)    
+        NoSleepCtrl -s 1
+        echostate I "Engaging NoSleep."
+    fi
+    echostate I "Starting backup."
+    tmutil startbackup
+    echostate -n I "Waiting for backup to come up ... "
+
+    MAXWAIT=60
+    for I in `seq 1 $MAXWAIT`; do
+        if tmrunning; then
+            break;
+        fi
+        echo -n "#"
+        sleep 1;
+    done
+    echo ""
+
+    if [[ $I == $MAXWAIT ]]; then
+        echostate E "Backup did not come up within 60 seconds."
+    else 
+        while tmrunning; do
+            NEWPHASE=$(tmutil currentphase)
+            if [ "$PHASE" != "$NEWPHASE" ]; then
+                echostate I "Current phase: $NEWPHASE"
+                PHASE=$NEWPHASE
+            fi 
+            sleep 10
+        done
+
+        if [ $HASNOSLEEP ]; then
+            echostate I "Returning NoSleep to original state."
+            NoSleepCtrl -s $NOSLEEPSAVESTATE
+        fi
+
+        echostate I "Finished backup."
+    fi
+}
+
+if tmrunning; then
+    echostate W "Backup is already running. Exiting ..."
+    exit 1
+fi
+
+if [[ $# == 0 ]]; then
+    caffeinate $0 RUN
+else
+    tmrun
+fi
