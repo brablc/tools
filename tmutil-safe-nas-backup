@@ -1,4 +1,8 @@
 #!/bin/bash
+# Author: http://brablc.com/
+# Repo:   https://github.com/brablc/clit/blob/master/tmutil-safe-nas-backup
+#
+# Requirements: NoSleepCtrl from http://code.google.com/p/macosx-nosleep-extension/issues/detail?id=28#c8 - take Volanins built (see the issue)
 
 function tmrunning() {
     return $([ $(tmutil currentphase) != 'BackupNotRunning' ])
@@ -29,7 +33,7 @@ function tmrun() {
     tmutil startbackup
     echostate -n I "Waiting for backup to come up ... "
 
-    MAXWAIT=60
+    MAXWAIT=180
     for I in `seq 1 $MAXWAIT`; do
         if tmrunning; then
             break;
@@ -51,12 +55,12 @@ function tmrun() {
             sleep 10
         done
 
-        if [ $HASNOSLEEP ]; then
-            echostate I "Returning NoSleep to original state."
-            NoSleepCtrl -s $NOSLEEPSAVESTATE
-        fi
-
         echostate I "Finished backup."
+    fi
+
+    if [ $HASNOSLEEP ]; then
+        echostate I "Returning NoSleep to original state."
+        NoSleepCtrl -s $NOSLEEPSAVESTATE
     fi
 }
 
