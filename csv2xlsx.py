@@ -28,7 +28,7 @@ from openpyxl.workbook import Workbook
 
 parser = argparse.ArgumentParser()
 parser.add_argument("input_file")
-parser.add_argument("-d", "--delimiter", type=str, default=";", help="select delimiter character")
+parser.add_argument("-d", "--delimiter", default="\t", help="select delimiter character")
 args = parser.parse_args()
 
 if not ".csv" in args.input_file:
@@ -40,7 +40,8 @@ workbook = Workbook()
 sheet = workbook.create_sheet(0)
 
 for row_index, row in enumerate(
-    csv.reader(open(args.input_file), args.delimiter)):
-    for col_index, col in enumerate(row):            
+    csv.reader(open(args.input_file), delimiter=args.delimiter)):
+    for col_index, col in enumerate(row):
         sheet.cell(row = row_index, column = col_index).value = col
+
 workbook.save(open(args.input_file.replace(".csv", ".xlsx") , "w"))
