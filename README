@@ -12,3 +12,9 @@ plane - stands for perl with -lane switches.
  * You can print multiple fields:
 
      plane 'print join("\t",@F[0..2,-1])'
+
+csv2xlsx.py - convert CSV to XLSX
+
+ * Requirements:
+
+    sudo easy_install openpyxl
