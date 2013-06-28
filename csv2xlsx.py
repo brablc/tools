@@ -3,6 +3,7 @@
 FUNCTION: Converts a CSV (tab delimited) file to an Excel xlsx file.
 
 Copyright (c) 2012, Konrad Foerstner <konrad@foerstner.org>
+Copyright (c) 2013, Ondrej Brablc <ondrej@brablc.com>
 
 Permission to use, copy, modify, and/or distribute this software for
 any purpose with or without fee is hereby granted, provided that the
