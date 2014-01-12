@@ -3,7 +3,7 @@
 $dir = shift @ARGV || ".";
 $dir =~ s/ /\\ /g;
 @FILES = sort glob "$dir/*.*";
-@IMAGES = sort glob "$dir/*.{jpg,jpeg,JPG,JPEG}";
+@IMAGES = grep { /\.(jpe?g)/i } @FILES;
 
 my $imageRef = shift @IMAGES;
 if (! -f $imageRef) {
