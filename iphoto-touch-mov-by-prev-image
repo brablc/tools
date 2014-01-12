@@ -1,0 +1,22 @@
+#!/usr/bin/perl
+
+$dir = shift @ARGV || ".";
+$dir =~ s/ /\\ /g;
+@FILES = sort glob "$dir/*.*";
+@IMAGES = sort glob "$dir/*.{jpg,jpeg,JPG,JPEG}";
+
+my $imageRef = shift @IMAGES;
+if (! -f $imageRef) {
+    print STDERR "-F|No images found to take timestamp from.\n";
+    die;
+}
+
+for my $file (@FILES) {
+
+    if ($file =~ /\.(jpe?g)$/i) {
+        $imageRef = $file;
+    }
+    if ($file =~ /.mov$/i) {
+        system("touch -mac -r '$imageRef' '$file'");
+    }
+}
