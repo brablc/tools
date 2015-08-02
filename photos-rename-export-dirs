@@ -1,0 +1,37 @@
+#!/usr/bin/perl
+
+use strict;
+
+my $importdir = shift @ARGV || ".";
+chdir $importdir;
+
+my @DIRS = sort grep { chop; /.{2,}/ } `gfind -type d`;
+
+for my $dir (@DIRS) {
+
+    if ($dir !~ /((?<name>.*), )?(?<day>\d+)\.(?<month>\d+)\.(?<year>\d+)/) {
+        print STDERR "-W|Directory '$dir' not matching export format from Apple Photos!\n";
+        next;
+    }
+
+    my $name = '';
+
+    if ($+{name}) {
+        $name = $+{name};
+        $name =~ s@^\./@@;
+        $name =~ s/(.*),\1/$1/;
+        $name = ' ' . $name;    
+    }
+    my $targetDir = sprintf '%04d-%02d-%02d%s', ($+{year}, $+{month}, $+{day}, $name);
+
+    if (! -d $targetDir) {
+        $dir =~ s/'/'\\''/g;
+        $targetDir =~ s/'/'\\''/g;
+        printf "mv -v '%s' '%s'\n", ($dir, $targetDir);
+    }
+    else {
+        print STDERR "-W|Directory '$targetDir' exists!. Skipping '$dir'.\n";
+    }
+}
+
+print STDERR "-I|Process the output as shell commands.\n";

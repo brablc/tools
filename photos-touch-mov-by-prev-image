@@ -1,0 +1,34 @@
+#!/usr/bin/perl
+
+$dir = shift @ARGV || ".";
+chdir $dir;
+@DIRS = grep { chop; } `gfind -iname '*.mov' ! -name '.*' -printf '%h\n' | sort | uniq`;
+
+for my $dir (@DIRS) {
+    print "-I|Processing directory '$dir'\n";
+    TouchMovInDir( $dir );
+}
+
+sub TouchMovInDir() {
+    $dir = $origdir = shift @_;
+    $dir =~ s/ /\\ /g;
+    @FILES = sort glob "$dir/*.*";
+    @IMAGES = grep { /\.(jpe?g)/i } @FILES;
+
+    my $imageRef = shift @IMAGES;
+    if (! -f $imageRef) {
+        print STDERR "-W|No images found to take timestamp from in '$origdir'.\n";
+        return;
+    }
+
+    for my $file (@FILES) {
+
+        if ($file =~ /\.(jpe?g)$/i) {
+            $imageRef = $file;
+        }
+        if ($file =~ /.mov$/i) {
+            print "-I|Touching '$file' according to '$imageRef'\n";
+            #system("touch -mac -r '$imageRef' '$file'");
+        }
+    }
+}
