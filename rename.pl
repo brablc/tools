@@ -8,7 +8,7 @@ Usage: rename [-i] expr [files]
  
 This script's first argument is Perl code that alters the filename (stored in \$_ ) to reflect how you want the file renamed. It can do this because it uses an eval to do the hard work. It also skips rename calls when the filename is untouched. This lets you simply use wildcards like rename EXPR * instead of making long lists of filenames. 
 
-Use the switch -i to see interactively what it will do.
+Use the switch -i to see interactively what it will do, expected answer is no/yes/all (first letter is enough).
  
 Here are examples of calling the rename program from your shell:
  
@@ -33,21 +33,22 @@ EOF
 
 $in = 0;
 do {
-	$op = shift or die $help;
+        $op = shift or die $help;
 } while ($op eq "-i" && ($in = 1));
 
 chomp(@ARGV = <STDIN>) unless @ARGV;
 for (@ARGV) {
     $was = $_;
     eval $op;
-    if ($in) {
+    if ($was ne $_ && $in) {
         print "'$was' => '$_': ";
         $rsp = <STDIN>;
         unless (defined $rsp) {
-        	$rsp = "n";
-        	print "$rsp\n";
+                $rsp = "n";
+                print "$rsp\n";
         }
-        next unless $rsp =~ /^y/i;
+        $in = 0 if $rsp =~ /^a/i;
+        next unless $rsp =~ /^[ya]/i;
     }
     die $@ if $@;
     rename($was,$_) unless $was eq $_;
