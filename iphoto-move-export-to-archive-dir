@@ -1,0 +1,55 @@
+#!/usr/bin/perl
+
+use strict;
+
+my $help = <<_HELP;
+Usage: $0 ARCHIVE_ROOT FILES ...
+_HELP
+
+my $archive = shift @ARGV || die $help;
+
+chomp(@ARGV = <STDIN>) unless @ARGV;
+
+my %ARCHIVE_DIRS;
+
+for my $from (@ARGV) {
+
+    if ($from !~ m@((.*)/)?([^/]+)$@) {
+        print STDERR "-F|Cannot parse filename $from.";
+        die;
+    }
+    my ($dir, $file ) = ($2,$3);
+
+    my $mtime = (stat $from)[9];
+    my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime($mtime);
+    $year += 1900;
+    $mon += 1;
+
+    my $archiveYear = sprintf("%s/%04d", $archive, $year);
+    my $archiveDir = sprintf("%s/%04d-%02d-%02d", $archiveYear, $year, $mon, $mday);
+
+    if (! defined($ARCHIVE_DIRS{$archiveDir})) {
+        $ARCHIVE_DIRS{$archiveDir} = 1;
+        if ( ! -d $archiveYear) {
+            mkdir $archiveYear or die "Cannot create dir $archiveYear: $!";
+        }
+        if ( ! -d $archiveDir) {
+            mkdir $archiveDir or die "Cannot create dir $archiveDir: $!";
+        }
+    }
+
+    my $to = sprintf("%s/%s", $archiveDir, $file); 
+    
+    unless (-f $to) {
+        system("mv -vf '$from' '$to'");
+		# system("touch -mac -r '$from' '$to'");
+    } else {
+        my $sourceSize = -s $from;
+        my $archiveSize = -s $to;
+        if ($sourceSize != $archiveSize) {
+            print STDERR "-W|File '$to' already exists. Sizes differ (src $sourceSize, target $archiveSize). Skipping copy.\n";
+        } else {
+            print STDERR "-W|File '$to' already exists. Same sized. Skipping copy.\n";
+	}
+    }
+}
