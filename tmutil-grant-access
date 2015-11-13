@@ -1,0 +1,5 @@
+#!/bin/bash
+
+sudo chflags -Rv nouchg $*
+sudo chmod -RN $* 
+sudo chown -Rv $USER $*
