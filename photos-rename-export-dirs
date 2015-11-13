@@ -5,11 +5,26 @@ use strict;
 my $importdir = shift @ARGV || ".";
 chdir $importdir;
 
+my %months = (
+    'January' => 1,
+    'February' => 2,
+    'March' => 3,
+    'April' => 4,
+    'May' => 5,
+    'June' => 6,
+    'July' => 7,
+    'August' => 8,
+    'September' => 9,
+    'October' => 10,
+    'November' => 11,
+    'December' => 12,
+);
+
 my @DIRS = sort grep { chop; /.{2,}/ } `gfind -type d`;
 
 for my $dir (@DIRS) {
 
-    if ($dir !~ /((?<name>.*), )?(?<day>\d+)\.(?<month>\d+)\.(?<year>\d+)/) {
+    if ($dir !~ /((?<name>.*), )?(?<day>\d+) (?<month>\w+) (?<year>\d+)/) {
         print STDERR "-W|Directory '$dir' not matching export format from Apple Photos!\n";
         next;
     }
@@ -22,7 +37,8 @@ for my $dir (@DIRS) {
         $name =~ s/(.*),\1/$1/;
         $name = ' ' . $name;    
     }
-    my $targetDir = sprintf '%04d-%02d-%02d%s', ($+{year}, $+{month}, $+{day}, $name);
+    
+    my $targetDir = sprintf '%04d-%02d-%02d%s', ($+{year}, $months{ $+{month} }, $+{day}, $name);
 
     if (! -d $targetDir) {
         $dir =~ s/'/'\\''/g;
