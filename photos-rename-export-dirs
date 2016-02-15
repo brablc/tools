@@ -18,13 +18,31 @@ my %months = (
     'October' => 10,
     'November' => 11,
     'December' => 12,
+    'ledna' => 1,
+    'února' => 2,
+    'března' => 3,
+    'dubna' => 4,
+    'května' => 5,
+    'června' => 6,
+    'července' => 7,
+    'srpna' => 8,
+    'září' => 9,
+    'října' => 10,
+    'listopadu' => 11,
+    'prosince' => 12,
 );
 
 my @DIRS = sort grep { chop; /.{2,}/ } `gfind -type d`;
 
 for my $dir (@DIRS) {
 
-    if ($dir !~ /((?<name>.*), )?(?<day>\d+) (?<month>\w+) (?<year>\d+)/) {
+    if ($dir =~ /((?<name>.*), )?(?<day>\d+) (?<month>\w+) (?<year>\d+)/) {
+        
+    } 
+    elsif ( $dir =~ /((?<name>.*), )?(?<day>\d+)\. (?<month>\w+) (?<year>\d+)/ ) {
+    
+    }
+    else {       
         print STDERR "-W|Directory '$dir' not matching export format from Apple Photos!\n";
         next;
     }
