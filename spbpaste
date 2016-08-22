@@ -1,0 +1,3 @@
+#!/bin/bash
+
+ssh $* 'cat .pastebin; >$_'
