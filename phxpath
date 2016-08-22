@@ -1,0 +1,57 @@
+#!/usr/bin/php
+<?php
+
+ini_set('display_errors','On');
+error_reporting(E_ALL);
+
+if ($argc < 3) {
+    $err = <<<__USAGE
+Usage: phxpath FILE XPATH-EXPRESSION [/ENCLOSING/ELEMENTS]
+
+If /ENCLOSING/ELEMENTS are used, valid XML will be printed. 
+Otherwise just values.
+
+Please be aware of namespaces. The easiest way is to remove them
+from the originating document:
+
+    sed -e '2 s/xmlns/ignore/g' -i .orig FILE
+
+Output can be formatted using:
+
+    ... | xmllint --format -
+__USAGE;
+    fprintf(STDERR, $err);
+    exit(22);
+}
+
+if (!is_file($argv[1])) {
+    fprintf(STDERR, "File '$argv[1]' not found!\n");       
+    exit(2);
+}
+
+$xml = new SimpleXMLElement(file_get_contents($argv[1]));
+
+$result = $xml->xpath($argv[2]);
+
+if (!empty($argv[3])) {
+    $enclosure = explode('/', $argv[3]);
+    if ($enclosure[0] == '') {
+        array_shift($enclosure);
+    }
+    for ($i=0; $i<count($enclosure);$i++) {
+        echo str_repeat(' ',$i) . "<".$enclosure[$i].">\n";
+    }
+
+    foreach ($result as $node) {
+        echo $node->asXml();
+    }
+
+    for ($i=count($enclosure)-1; $i>=0; $i--) {
+        echo str_repeat(' ',$i) . "</".$enclosure[$i].">\n";
+    }
+}
+else {
+    while(list( , $node) = each($result)) {
+        echo $node,"\n";
+    }
+}
