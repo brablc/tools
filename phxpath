@@ -1,6 +1,11 @@
 #!/usr/bin/php
 <?php
 
+/***
+ * Original author: Ondrej Brablc
+ * Location:        https://github.com/brablc/tools/blob/master/phxpath
+ */
+
 ini_set('display_errors','On');
 error_reporting(E_ALL);
 
