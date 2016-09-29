@@ -1,0 +1,33 @@
+#!/usr/bin/perl
+
+use MIME::Base64;
+use Term::ReadKey;
+
+if (scalar @ARGV < 1) {
+
+    print STDERR "Usage: $0 <EMAIL> [PASSWORD]\n";
+    exit(22);
+
+}
+
+$email = @ARGV[0];
+$password = @ARGV[1];
+
+if (! defined($password)) {
+    print "Type your password:";
+    ReadMode('noecho'); # don't echo
+    chomp($password = <STDIN>);
+    ReadMode(0);        # back to normal
+    print "\n";
+}
+
+$myip = `dig +short myip.opendns.com \@resolver1.opendns.com`;
+chomp($myip);
+$myhost = `dig +short -x $myip`;
+chomp($myhost);
+
+print "EHLO $myhost\n";
+print "AUTH LOGIN\n";
+print encode_base64($email,'')."\n";
+print encode_base64($password,'')."\n";
+print "AUTH PLAIN ".encode_base64("\000$email\000$password",'')."\n";
