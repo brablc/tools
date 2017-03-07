@@ -1,3 +1,12 @@
 #!/bin/bash
-URL=${1?Pass URL as parameter.}
-curl -o /dev/null --silent --head --write-out "$URL %{http_code} %{redirect_url}\n" "$URL"
+RECURSE=0
+if [[ $1 == '-r' ]]; then
+    shift
+    RECURSE=1
+fi
+URL=${1?Usage: $0 [-r] <URL>}
+read URL RETCODE NEWURL < <(curl -o /dev/null --silent --head --write-out "$URL %{http_code} %{redirect_url}\n" "$URL")
+echo $URL $RETCODE $NEWURL
+if [[ $RECURSE == 1 && ( $RETCODE == '301' || $RETCODE == '302' ) ]]; then
+    $0 -r $NEWURL
+fi
