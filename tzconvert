@@ -1,0 +1,13 @@
+#!/usr/bin/php
+<?php
+
+$formatIn = '\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d\.000Z';
+
+function convertDateTime($matches) {
+	$dt = strtotime($matches[0]);
+	return strftime( '%Y-%m-%dT%H:%M:%S', date($dt));
+}
+
+while ($line = fgets(STDIN)) {
+	echo preg_replace_callback('/'.$formatIn.'/', 'convertDateTime', $line); 
+}
