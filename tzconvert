@@ -5,7 +5,7 @@ $formatIn = '\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d\.000Z';
 
 function convertDateTime($matches) {
 	$dt = strtotime($matches[0]);
-	return strftime( '%Y-%m-%dT%H:%M:%S', date($dt));
+	return strftime( '%Y-%m-%dT%H:%M:%S%z', date($dt));
 }
 
 while ($line = fgets(STDIN)) {

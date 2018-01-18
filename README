@@ -18,3 +18,8 @@ csv2xlsx.py - convert CSV to XLSX
  * Requirements:
 
     sudo easy_install openpyxl
+
+tzcovert - convert filter from Zulu to local time
+    
+     echo "2017-04-02T23:53:32.000Z" | tzconvert
+     # returns: 2017-04-03T01:53:32

@@ -5,7 +5,10 @@ perl -MSocket -plane '
 		%CACHE=();
 		sub gethost {
 			$ip = join( ".", unpack "C4", pack "N", $1);
-			$CACHE{$ip} = gethostbyaddr(inet_aton($1),AF_INET) unless defined $CACHE{$ip};
+			unless (defined $CACHE{$ip}) {
+				@name = gethostbyaddr(inet_aton($1),AF_INET);
+				$CACHE{$ip} = $name[0] ? $name[0] : $1;
+			}
 			return $CACHE{$ip};
 		}
 	}
