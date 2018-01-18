@@ -1,0 +1,24 @@
+#!/usr/bin/perl
+
+while (<POSTQUEUE>) {
+    if (/^(\w+)(\*|\!)?\s/) {
+        $queue_id = $1;
+        $_ = <POSTQUEUE>;
+        chop;
+        $msg = $_;
+
+        if (/^\(.*(\d{3}) (\d.\d.\d) .*\)$/) {
+            $reply = $1;
+            $error = $2;
+
+            $_ = <POSTQUEUE>;
+            chop;
+            s/\s+//g;
+            $email = $_;
+
+            print "$queue_id $reply $error $email $msg\n";
+        }
+    }
+}
+
+close(POSTQUEUE);
