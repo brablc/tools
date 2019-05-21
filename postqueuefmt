@@ -1,9 +1,10 @@
 #!/usr/bin/perl
 
-while (<POSTQUEUE>) {
+while (<>) {
     if (/^(\w+)(\*|\!)?\s/) {
+        $header = $_;
         $queue_id = $1;
-        $_ = <POSTQUEUE>;
+        $_ = <>;
         chop;
         $msg = $_;
 
@@ -11,14 +12,16 @@ while (<POSTQUEUE>) {
             $reply = $1;
             $error = $2;
 
-            $_ = <POSTQUEUE>;
+            $_ = <>;
             chop;
             s/\s+//g;
             $email = $_;
 
             print "$queue_id $reply $error $email $msg\n";
+        } elsif ($header =~ /MAILER-DAEMON/) {
+            print "$queue_id -- MAILER-DAEMON\n";
+        } else {
+            print "$queue_id -- PARSE-ERROR\n";
         }
     }
 }
-
-close(POSTQUEUE);

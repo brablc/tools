@@ -1,0 +1,3 @@
+#!/bin/bash
+
+curl -s ipinfo.io/$1 | jq .
