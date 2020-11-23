@@ -1,0 +1,18 @@
+#!/usr/bin/perl -na
+{
+    $m{$F[0]}{$F[1]}=$F[2];
+    $s{$F[1]}+=$F[2];
+}
+END {
+    $"="\t";
+    @h=sort {$s{$b} <=> $s{$a}} keys %s;
+    splice @h, 10;
+    print " ", $", "@h\n";
+    for $d (sort {$a<=>$b} keys %m) {
+         print "$d",$";
+         for $c (@h) {
+            print $m{$d}{$c}//0,$";
+         }
+         print "\n";
+    }
+}
