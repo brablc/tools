@@ -1,23 +1,27 @@
 #!/usr/bin/perl -san
 {
-    $M{$F[0]}{$F[1]}=$F[2];
-    $C{$F[1]}+=$F[2];
-    $R{$F[0]}+=$F[2];
+    $M{$F[0]}{$F[1]} = $F[2];
+    $C{$F[1]} += $F[2];
+    $R{$F[0]} += $F[2];
 }
 END {
-    $"="\t";
-    @h=sort {$C{$b} <=> $C{$a}} keys %C;
-    splice @h, $max // 10;
-    print " ", $", "@h", $", "Other\n";
+    $" = "\t";
+    $max = $max // 10;
+    @h = sort {$C{$b} <=> $C{$a}} keys %C;
+    $hCnt = scalar @h;
+    splice @h, $max if $hCnt > $max;
+    print " ", $", "@h";
+    print $", "Other" if $hCnt > $max;
+    print "\n";
     for $d (sort {$a cmp $b} keys %R) {
-         print "$d",$";
+         print "$d", $";
          $shown = 0;
          for $c (@h) {
             $v = $M{$d}{$c}//0;
             $shown += $v;
-            print $v,$";
+            print $v, $";
          }
-         print int($R{$d})-$shown;
+         print $R{$d} - $shown if $hCnt > $max;
          print "\n";
     }
 }
