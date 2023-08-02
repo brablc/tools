@@ -1,0 +1,26 @@
+#!/usr/bin/env python3
+
+import sys
+import json
+import xmltodict
+
+def convert(xml_str):
+    data_dict = xmltodict.parse(xml_str)
+    lower_case_dict = lowercase_dict(data_dict)
+    json_data = json.dumps(lower_case_dict)
+    return json_data
+
+def lowercase_dict(d):
+    new_dict = {}
+    for k, v in d.items():
+        if isinstance(v, dict):
+            v = lowercase_dict(v)
+        elif isinstance(v, list):
+            v = [lowercase_dict(item) if isinstance(item, dict) else item for item in v]
+        new_dict[k.lower()] = v
+    return new_dict
+
+if __name__ == "__main__":
+    xml_input = sys.stdin.read()
+    json_output = convert(xml_input)
+    print(json_output)
