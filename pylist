@@ -1,0 +1,38 @@
+#!/bin/bash
+
+# Check standard locations
+locations=(
+    "/usr/bin/"
+    "/usr/local/bin/"
+    "/opt/"
+    "/opt/local/bin/"
+    "$HOME/.local/bin/"
+)
+
+function format() {
+    while read INTERPRET; do
+        VERSION=$($INTERPRET --version 2>/dev/null | sed 's/^Python //')
+        echo $VERSION $INTERPRET
+    done < <(grep -v -e \-config -e \-build)
+}
+
+for location in "${locations[@]}"; do
+    if [ -d "$location" ]; then
+        ls -1 "$location"python* 2>/dev/null | format
+    fi
+done
+
+# Check the PATH environment variable
+IFS=':' read -r -a paths <<< "$PATH"
+for path in "${paths[@]}"; do
+    if [ -d "$path" ]; then
+        ls -1 "$path/python*" 2>/dev/null | format
+    fi
+done
+
+pyenv versions | grep -v system | while read VERSION; do echo $(pyenv prefix $VERSION)/bin/python; done | format
+
+# Check the CONDA_PREFIX environment variable
+if [ ! -z "$CONDA_PREFIX" ]; then
+    ls -1 "$CONDA_PREFIX/bin/python*" 2>/dev/null
+fi
