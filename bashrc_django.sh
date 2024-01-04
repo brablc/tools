@@ -48,36 +48,3 @@ _dj() {
     return 0
 }
 complete -F _dj dj
-
-
-function dj_liverun() {
-
-    vactivate || return 1
-    _dj_init
-
-    let session_name='dj_liverun'
-
-    if ! tmux has-session -t $session_name 2>/dev/null; then
-
-        tmux new-session -d -s $session_name
-
-        tmux split-window -v
-        tmux split-window -v
-        tmux select-pane -t 2 # Select Pane 2 (bottom pane)
-        tmux split-window -h  # Split Pane 2 horizontally: creates Pane 3 beside Pane 2
-
-        tmux select-pane -t 1
-        tmux send-keys 'while true; do dj runserver 0.0.0.0:8000; done' C-m
-
-        tmux select-pane -t 2
-        tmux send-keys 'dj livereload' C-m
-
-        tmux select-pane -t 3
-        tmux resize-pane -R 20
-        tmux send-keys 'npm run tailwind' C-m
-
-        tmux select-pane -t 0
-    fi
-
-    tmux attach-session -t $session_name
-}
